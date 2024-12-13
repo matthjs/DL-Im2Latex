@@ -7,6 +7,14 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.10"
+transformers = "^4.47.0"
+torch = "^2.5.1"
+numpy = "^2.2.0"
+evaluate = "^0.4.3"
+datasets = "^3.2.0"
+pillow = "^11.0.0"
+tqdm = "^4.67.1"
+peft = "^0.14.0"
 
 
 [build-system]
