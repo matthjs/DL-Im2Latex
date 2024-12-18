@@ -25,25 +25,26 @@ class AbstractTrainer(ABC):
         """
 
     @abstractmethod
-    def train(self) -> None:
+    def train(self) -> 'AbstractTrainer':
         """
         Train a model.
+        Maybe change signature to return AbstractTrainer for method
         """
         pass
 
     @abstractmethod
-    def evaluate(self) -> None:
+    def evaluate(self) -> 'AbstractTrainer':
         """
         Evaluate a model.
         """
         pass
 
     @abstractmethod
-    def save_model(self, checkpoint_path: str) -> None:
+    def save_model(self, checkpoint_path: str) -> 'AbstractTrainer':
         pass
 
     @abstractmethod
-    def load_model(self, checkpoint_path) -> None:
+    def load_model(self, checkpoint_path) -> 'AbstractTrainer':
         pass
 
     # TODO Add other methods if needed.

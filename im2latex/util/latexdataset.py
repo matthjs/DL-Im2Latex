@@ -71,3 +71,23 @@ class LatexDataset(Dataset):
             "labels": latex_tokens
         }
 
+
+class DataCollator:
+    padding_value = -1
+
+    @staticmethod
+    # custom data collator
+    def data_collator(batch):
+        pixel_values = torch.stack([item['pixel_values'] for item in batch])
+        labels = [item['labels'] for item in batch]
+
+        if DataCollator.padding_value < 0:
+            raise ValueError("padding value not set.")
+
+        # padding the labels
+        labels = pad_sequence(labels, batch_first=True, padding_value=DataCollator.padding_value)
+
+        return {
+            'pixel_values': pixel_values,
+            'labels': labels
+        }
