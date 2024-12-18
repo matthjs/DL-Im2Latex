@@ -3,8 +3,9 @@ from torch.utils.data import DataLoader, SequentialSampler, RandomSampler
 from im2latex.conf.config_classes import Config
 from im2latex.trainers.abstracttrainer import AbstractTrainer
 import torch
-import torch.distributed as dist
+import wandb
 import evaluate
+import omegaconf
 from transformers import (
     VisionEncoderDecoderModel,
     SwinConfig,
@@ -22,6 +23,7 @@ from transformers import (
 )
 
 from datasets import load_dataset
+from dotenv import load_dotenv
 import numpy as np
 from tqdm import tqdm
 import os
@@ -34,6 +36,8 @@ from transformers import logging
 # Stop intialization of weights warning
 logging.set_verbosity_error()
 
+# Load environment variables
+load_dotenv()
 
 class VisionEncoderDecoderTrainer(AbstractTrainer):
     """
@@ -191,6 +195,13 @@ class VisionEncoderDecoderTrainer(AbstractTrainer):
         total_steps = 0
 
         total_steps_per_epoch = len(self.train_dataloader)
+        
+        # Convert config to dictionary for logging
+        dict_cfg = wandb.config = omegaconf.OmegaConf.to_container(
+            self.cfg, resolve=True, throw_on_missing=True
+        )
+        
+        wandb.init(project="im2latex", config=dict_cfg)
 
         for epoch in range(self.num_epochs):
             epoch_start_time = time.time()
@@ -231,10 +242,18 @@ class VisionEncoderDecoderTrainer(AbstractTrainer):
                     train_losses.append(average_loss)
 
                     val_loss, bleu_score = self.evaluate()
+                    self.model.train()
 
                     if self.cfg.log_level >= 1:
                         logger.info(
                             f"Step {total_steps} - Train Loss: {average_loss}, Val Loss: {val_loss}, BLEU: {bleu_score}")
+                        
+                    wandb.log({
+                                "train_loss": average_loss,
+                                "val_loss": val_loss,
+                                "val_bleu_score": bleu_score,
+                            },
+                            step=total_steps)
 
                     if val_loss < best_val_loss:
                         best_val_loss = val_loss
@@ -249,6 +268,10 @@ class VisionEncoderDecoderTrainer(AbstractTrainer):
         
         final_val_loss, final_bleu = self.evaluate(use_full_eval=True)
         logger.info(f"Final Validation Loss: {final_val_loss}, Final BLEU: {final_bleu}")
+        
+        # Add final metrics to wandb summary
+        wandb.run.summary["final_val_loss"] = final_val_loss
+        wandb.run.summary["final_bleu"] = final_bleu
 
         return self
 
