@@ -2,3 +2,4 @@
 .idea
 outputs
 __pycache__
+checkpoints

@@ -15,7 +15,7 @@ def main(cfg: Config) -> None:
 
     if cfg.mode == "train":
         trainer = VisionEncoderDecoderTrainer(cfg)
-        # trainer.train()
+        trainer.train()
     elif cfg.mode == "fine_tune":
         pass
     elif cfg.mode == "inference":

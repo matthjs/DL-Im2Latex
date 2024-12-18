@@ -63,13 +63,14 @@ class VisionEncoderDecoderTrainer(AbstractTrainer):
         self.model.config.no_repeat_ngram_size = self.cfg.decoding.no_repeat_ngram_size
         self.model.config.length_penalty = self.cfg.decoding.length_penalty
         
-        self.max_length = self.cfg.decoding.max_length
-        self.early_stopping = self.cfg.decoding.early_stopping
-        self.num_beams = self.cfg.decoding.num_beams
+        self.model.config.max_length = self.cfg.decoding.max_length
+        self.model.config.early_stopping = self.cfg.decoding.early_stopping
+        self.model.config.num_beams = self.cfg.decoding.num_beams
         
         self.model.decoder.resize_token_embeddings(len(self.tokenizer))
 
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        print(f"Using device: {self.device}")
 
         self.model.to(self.device)
         torch.compile(self.model)
@@ -243,6 +244,8 @@ class VisionEncoderDecoderTrainer(AbstractTrainer):
             
             if self.cfg.log_level >= 1:
                 logger.info(f"Epoch {epoch + 1} completed in {epoch_duration:.2f} seconds.")
+        
+        self.save_model(os.path.join(self.checkpoint_dir, f"final_checkpoint_step_{total_steps}"))
 
         return self
 
@@ -272,19 +275,14 @@ class VisionEncoderDecoderTrainer(AbstractTrainer):
                 val_losses.append(outputs.loss.item())
 
                 # Generate predictions
-                generated_ids = self.model.module.generate(pixel_values,
-                                                           num_beams=self.num_beams,
-                                                           max_length=self.max_length,
-                                                           early_stopping=True)
+                generated_ids = self.model.generate(pixel_values)
                 
                 generated_texts = self.tokenizer.batch_decode(generated_ids, skip_special_tokens=True)
                 label_texts = self.tokenizer.batch_decode(labels, skip_special_tokens=True)
 
                 bleu = self.bleu_metric.compute(predictions=generated_texts, references=label_texts)
+                
                 bleu_scores.append(bleu["google_bleu"])
-
-                bleu_tensor = torch.tensor(bleu, device=self.device)
-                bleu_scores.append(bleu_tensor.item())
 
                 num_evaluated_batches += 1
 
