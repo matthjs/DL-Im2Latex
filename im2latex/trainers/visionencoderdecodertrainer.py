@@ -74,7 +74,7 @@ class VisionEncoderDecoderTrainer(AbstractTrainer):
         self.model.decoder.resize_token_embeddings(len(self.tokenizer))
 
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        print(f"Using device: {self.device}")
+        logger.info(f"Using device: {self.device}")
 
         self.model.to(self.device)
         torch.compile(self.model)
@@ -275,7 +275,7 @@ class VisionEncoderDecoderTrainer(AbstractTrainer):
 
         return self
 
-    def evaluate(self, use_full_eval=False) -> 'AbstractTrainer':
+    def evaluate(self, use_full_eval=False) -> tuple:
         """
         Evaluate the VisionEncoderDecoderModel.
 
