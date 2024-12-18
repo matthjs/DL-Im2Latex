@@ -1,5 +1,5 @@
 import argparse
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Tuple
 import hydra
 from omegaconf import OmegaConf
@@ -25,14 +25,22 @@ class ModelConfig:
     feature_extractor: str = "microsoft/swin-base-patch4-window7-224-in22k"
     encoder_name: str = "microsoft/swin-base-patch4-window7-224-in22k"
     decoder_name: str = "gpt2"
-    max_length: int = 512
+    
+@dataclass
+class DecoderConfig:
+    max_length: int = 256
+    num_beams: int = 4
+    early_stopping: bool = True
+    no_repeat_ngram_size: int = 3
+    length_penalty: float = 2.0
 
 
 @dataclass
 class TrainingConfig:
     num_epochs: int = 10
-    batch_size_train: int = 32
-    batch_size_val: int = 32
+    batch_size_train: int = 8
+    batch_size_val: int = 8
+    eval_max_batches: int = 20
     learning_rate: float = 1e-4
     warmup_steps: int = 400
     max_grad_norm: float = 1.0
@@ -59,10 +67,11 @@ class MetricConfig:
 @dataclass
 class Config:
     log_level: int
-    torch: TorchConfig = TorchConfig()
-    dataset: DatasetConfig = DatasetConfig()
-    model: ModelConfig = ModelConfig()
-    training: TrainingConfig = TrainingConfig()
-    image: ImageConfig = ImageConfig()
-    checkpoint: CheckpointConfig = CheckpointConfig()
-    metric: MetricConfig = MetricConfig()
+    torch: TorchConfig = field(default_factory=TorchConfig)
+    dataset: DatasetConfig = field(default_factory=DatasetConfig)
+    model: ModelConfig = field(default_factory=ModelConfig)
+    decoder: DecoderConfig = field(default_factory=DecoderConfig)
+    training: TrainingConfig = field(default_factory=TrainingConfig)
+    image: ImageConfig = field(default_factory=ImageConfig)
+    checkpoint: CheckpointConfig = field(default_factory=CheckpointConfig)
+    metric: MetricConfig = field(default_factory=MetricConfig)

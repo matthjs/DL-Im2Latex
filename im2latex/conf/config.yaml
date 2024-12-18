@@ -15,7 +15,6 @@ model:
   feature_extractor: "microsoft/swin-base-patch4-window7-224-in22k"
   encoder_name: "microsoft/swin-base-patch4-window7-224-in22k"
   decoder_name: "gpt2"
-  max_length: 512
 
 # Not part of original configs but was hardcoded in the original code
 decoding:
@@ -28,8 +27,9 @@ decoding:
 training:
   distributed: False
   num_epochs: 10
-  batch_size_train: 32
-  batch_size_val: 32
+  batch_size_train: 8
+  batch_size_val: 8
+  eval_max_batches: 20
   learning_rate: 1e-4
   warmup_steps: 400
   max_grad_norm: 1.0

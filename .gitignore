@@ -1,4 +1,7 @@
 .venv
 .idea
+.env
 outputs
+wandb
 __pycache__
+checkpoints

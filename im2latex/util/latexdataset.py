@@ -13,7 +13,7 @@ class LatexDataset(Dataset):
             tokenizer,
             feature_extractor,
             phase,
-            image_size,    # <---
+            image_size,
             max_length=512
     ):
         self.dataset = dataset
