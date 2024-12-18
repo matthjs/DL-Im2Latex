@@ -1,9 +1,7 @@
 import hydra
 from omegaconf import OmegaConf
 from loguru import logger
-
 from im2latex.parser.config_classes import Config
-from im2latex.parser.parser import get_args
 
 
 @hydra.main(version_base=None, config_path="conf", config_name="config")
