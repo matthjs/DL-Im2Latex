@@ -1,0 +1,51 @@
+mode: "train"
+log_level: 1
+
+torch:
+  float32_matmul_precision: "high"
+  seed: 42
+
+dataset:
+  train_dataset_path: "OleehyO/latex-formulas"
+  split_dataset_name: "cleaned_formulas"
+  val_test_size: 0.2
+
+model:
+  tokenizer_name: "gpt2"
+  feature_extractor: "microsoft/swin-base-patch4-window7-224-in22k"
+  encoder_name: "microsoft/swin-base-patch4-window7-224-in22k"
+  decoder_name: "gpt2"
+  max_length: 512
+
+# Not part of original configs but was hardcoded in the original code
+decoding:
+  max_length: 256
+  early_stopping: True
+  no_repeat_ngram_size: 3
+  length_penalty: 2.0
+  num_beams: 4
+
+training:
+  distributed: False
+  num_epochs: 10
+  batch_size_train: 32
+  batch_size_val: 32
+  learning_rate: 1e-4
+  warmup_steps: 400
+  max_grad_norm: 1.0
+  betas:
+    - 0.95
+    - 0.98
+  eps: 1e-08
+
+image:
+  image_size:
+    - 224
+    - 468
+
+checkpoint:
+  checkpoint_dir: "checkpoints"
+  eval_steps: 200
+
+metric:
+  bleu: "google_bleu"
