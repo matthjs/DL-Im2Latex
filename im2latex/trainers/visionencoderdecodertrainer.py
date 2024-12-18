@@ -246,10 +246,13 @@ class VisionEncoderDecoderTrainer(AbstractTrainer):
                 logger.info(f"Epoch {epoch + 1} completed in {epoch_duration:.2f} seconds.")
         
         self.save_model(os.path.join(self.checkpoint_dir, f"final_checkpoint_step_{total_steps}"))
+        
+        final_val_loss, final_bleu = self.evaluate(use_full_eval=True)
+        logger.info(f"Final Validation Loss: {final_val_loss}, Final BLEU: {final_bleu}")
 
         return self
 
-    def evaluate(self) -> 'AbstractTrainer':
+    def evaluate(self, use_full_eval=False) -> 'AbstractTrainer':
         """
         Evaluate the VisionEncoderDecoderModel.
 
@@ -259,13 +262,16 @@ class VisionEncoderDecoderTrainer(AbstractTrainer):
         val_losses = []
         bleu_scores = []
         num_evaluated_batches = 0
+        
+        # Display purposes
+        total_batches = len(self.val_dataloader) if use_full_eval else self.eval_max_batches
 
         with (torch.no_grad()):
 
-            eval_iterator = tqdm(self.val_dataloader, desc=f"Evaluation", total=self.eval_max_batches)
+            eval_iterator = tqdm(self.val_dataloader, desc=f"Evaluation", total=total_batches)
 
             for batch_idx, batch in enumerate(eval_iterator):
-                if num_evaluated_batches >= self.eval_max_batches:
+                if not use_full_eval and num_evaluated_batches >= self.eval_max_batches:
                     break
 
                 pixel_values = batch["pixel_values"].to(self.device)
