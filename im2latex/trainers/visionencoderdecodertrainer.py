@@ -204,7 +204,7 @@ class VisionEncoderDecoderTrainer(AbstractTrainer):
                 logger.info(f"Epoch {epoch + 1} completed in {epoch_duration:.2f} seconds.")
 
         # Save final model checkpoint
-        self.save_model(os.path.join(self.checkpoint_dir, f"final_checkpoint_step_{total_steps}"))
+        self.save_model(os.path.join(self.checkpoint_dir, f"final_checkpoint"))
 
         # Evaluate final performance
         final_val_loss, final_bleu = self.evaluate(use_full_eval=True)
@@ -242,6 +242,8 @@ class VisionEncoderDecoderTrainer(AbstractTrainer):
             if global_step % self.eval_steps == 0 or (
                 epoch == self.num_epochs - 1 and step == total_steps_per_epoch - 1):
                 self._log_and_evaluate(global_step, interval_losses, train_losses)
+                
+        self.save_model(os.path.join(self.checkpoint_dir, f"checkpoint_step_{global_step}"))
 
         return interval_losses
 
@@ -292,9 +294,6 @@ class VisionEncoderDecoderTrainer(AbstractTrainer):
             "val_loss": val_loss,
             "val_bleu_score": bleu_score,
         }, step=global_step)
-
-        # Save best model checkpoint
-        self._save_best_checkpoint(val_loss, global_step)
 
     def _save_best_checkpoint(self, val_loss: float, global_step: int):
         """
