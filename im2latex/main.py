@@ -3,6 +3,7 @@ from omegaconf import OmegaConf
 from loguru import logger
 from im2latex.conf.config_classes import Config
 from im2latex.trainers import VisionEncoderDecoderTrainer, VisionEncoderDecoderFinetuner
+from dotenv import load_dotenv
 
 
 @hydra.main(version_base=None, config_path="conf", config_name="config")
@@ -25,4 +26,5 @@ def main(cfg: Config) -> None:
 
 
 if __name__ == "__main__":
+    load_dotenv()
     main()

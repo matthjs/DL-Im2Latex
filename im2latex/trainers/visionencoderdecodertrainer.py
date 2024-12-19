@@ -23,7 +23,6 @@ from transformers import (
 )
 
 from datasets import load_dataset
-from dotenv import load_dotenv
 import numpy as np
 from tqdm import tqdm
 import os
@@ -35,9 +34,6 @@ from transformers import logging
 
 # Stop intialization of weights warning
 logging.set_verbosity_error()
-
-# Load environment variables
-load_dotenv()
 
 class VisionEncoderDecoderTrainer(AbstractTrainer):
     """
