@@ -149,6 +149,8 @@ class VisionEncoderDecoderTrainer(AbstractTrainer):
         super().__init__()
         #! Current setup assumes a very specific order of initialization.
         self.cfg = cfg
+        
+        torch.set_float32_matmul_precision(cfg.torch.float32_matmul_precision)
 
         # Assigns variables for model, tokenizer, feature_extractor
         self.setup_model()
