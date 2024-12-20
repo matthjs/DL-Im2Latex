@@ -1,3 +1,6 @@
+import os
+
+import torch
 from peft import LoraConfig, IA3Config, get_peft_model
 import warnings
 from im2latex.trainers import VisionEncoderDecoderTrainer
@@ -8,14 +11,16 @@ from datasets import load_dataset
 from im2latex.util.latexdataset import LatexDataset, DataCollator
 
 from transformers import logging
+
 warnings.filterwarnings("ignore")
 
 
 class VisionEncoderDecoderFinetuner(VisionEncoderDecoderTrainer):
     """
-    Decoder class for VisionEncoderDecoderTrainer. Change the behavior to perform
+    Decorator class for VisionEncoderDecoderTrainer. Change the behavior to perform
     finetuning instead of full all parameter training.
     """
+
     def __init__(self, cfg: Config):
         super().__init__(cfg)
         self.lora_config = None
@@ -36,7 +41,7 @@ class VisionEncoderDecoderFinetuner(VisionEncoderDecoderTrainer):
             lora_alpha=self.cfg.finetuning.lora_alpha,
             target_modules=self.cfg.finetuning.target_modules,
             lora_dropout=self.cfg.finetuning.lora_dropout,
-            bias=self.cfg.finetuning.bias    # ignore type error
+            bias=self.cfg.finetuning.bias  # ignore type error
             # task_type="VL"  # Vision-Language task
         )
 
@@ -137,3 +142,16 @@ class VisionEncoderDecoderFinetuner(VisionEncoderDecoderTrainer):
                                           batch_size=self.cfg.training.batch_size_val,
                                           sampler=test_sampler,
                                           collate_fn=DataCollator.data_collator)
+
+    def save_model(self, checkpoint_path: str) -> 'AbstractTrainer':
+        """
+        Save the current model and tokenizer.
+
+        :param checkpoint_path: Path to save the model checkpoint.
+        """
+        os.makedirs(checkpoint_path, exist_ok=True)
+        self.model.base_model.save_pretrained(checkpoint_path)
+        self.tokenizer.save_pretrained(checkpoint_path)
+        print(f"Model saved at {checkpoint_path}")
+
+        return self

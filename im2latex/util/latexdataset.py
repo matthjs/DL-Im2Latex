@@ -38,8 +38,18 @@ class LatexDataset(Dataset):
 
     def __getitem__(self, idx):
         item = self.dataset[idx]
-        latex_sequence = item['latex_formula']
+        if 'latex_formula' in item:
+            latex_sequence = item['latex_formula']
+        elif 'text' in item:
+            latex_sequence = item['text']
+        else:
+            raise ValueError("No valid dataset type does not have 'latex' or 'text' key for items")
+
         image = item['image']
+
+        # converting RGBA to RGB for the test set --> some images have alphas
+        if image.mode == 'RGBA':
+            image = image.convert('RGB')
 
         # image processing
         if self.phase == 'train':
