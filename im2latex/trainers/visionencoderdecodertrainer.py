@@ -84,11 +84,10 @@ class VisionEncoderDecoderTrainer(AbstractTrainer):
         self.avg_val_loss = None
         self.avg_bleu = None
 
-    def setup_model(self):
+    def setup_model(self) -> None:
         """
         Set up the VisionEncoderDecoderModel and tokenizer
         """
-
         self.tokenizer = AutoTokenizer.from_pretrained(self.cfg.model.tokenizer_name)
         self.tokenizer.pad_token = self.tokenizer.eos_token
 
@@ -119,8 +118,7 @@ class VisionEncoderDecoderTrainer(AbstractTrainer):
         self.model.to(self.device)
         torch.compile(self.model)
 
-    def setup_dataset(self):
-
+    def setup_dataset(self) -> None:
         dataset = load_dataset(self.cfg.dataset.train_dataset_path, self.cfg.dataset.split_dataset_name)
         train_val_split = dataset["train"].train_test_split(test_size=self.cfg.dataset.val_test_size,
                                                             seed=self.cfg.torch.seed)
@@ -169,8 +167,7 @@ class VisionEncoderDecoderTrainer(AbstractTrainer):
                                           sampler=test_sampler,
                                           collate_fn=DataCollator.data_collator)
 
-    def setup_optimizers(self):
-
+    def setup_optimizers(self) -> None:
         self.optimizer = AdamW(
             self.model.parameters(),
             lr=self.cfg.training.learning_rate,

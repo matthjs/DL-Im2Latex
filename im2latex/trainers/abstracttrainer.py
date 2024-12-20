@@ -33,7 +33,7 @@ class AbstractTrainer(ABC):
         pass
 
     @abstractmethod
-    def evaluate(self) -> 'AbstractTrainer':
+    def evaluate(self) -> tuple:
         """
         Evaluate a model.
         """

@@ -1,8 +1,5 @@
-import argparse
 from dataclasses import dataclass, field
-from typing import Tuple
-import hydra
-from omegaconf import OmegaConf
+from typing import Tuple, Optional, List
 
 
 # Default settings are from paper.
@@ -25,7 +22,8 @@ class ModelConfig:
     feature_extractor: str = "microsoft/swin-base-patch4-window7-224-in22k"
     encoder_name: str = "microsoft/swin-base-patch4-window7-224-in22k"
     decoder_name: str = "gpt2"
-    
+
+
 @dataclass
 class DecoderConfig:
     max_length: int = 256
@@ -65,6 +63,27 @@ class MetricConfig:
 
 
 @dataclass
+class FineTuningConfig:
+    # Only make the finetunign configurable
+    lora_r: Optional[int] = None
+    lora_alpha: Optional[int] = None
+    # Target
+    target_modules: List[str] = field(default_factory=lambda: [
+        # Default encoder and decoder modules
+        "attn.qkv",
+        "attn.proj",
+        "mlp.fc1",
+        "mlp.fc2",
+        "c_attn",
+        "c_proj",
+        "c_fc",
+        "attn.c_proj"
+    ])
+    lora_dropout: Optional[float] = None
+    bias: Optional[str] = None
+
+
+@dataclass
 class Config:
     log_level: int
     torch: TorchConfig = field(default_factory=TorchConfig)
@@ -75,3 +94,4 @@ class Config:
     image: ImageConfig = field(default_factory=ImageConfig)
     checkpoint: CheckpointConfig = field(default_factory=CheckpointConfig)
     metric: MetricConfig = field(default_factory=MetricConfig)
+    finetuning: FineTuningConfig = field(default_factory=FineTuningConfig)

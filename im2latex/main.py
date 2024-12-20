@@ -10,6 +10,8 @@ from dotenv import load_dotenv
 def main(cfg: Config) -> None:
     """
     Main function, loads config file.
+    training --> python main.py --run --config-path conf --config-name config
+    finetuning --> python main.py --run --config-path conf --config-name finetuning_config
     """
     if cfg.log_level == 1:
         logger.info(OmegaConf.to_yaml(cfg))
@@ -17,8 +19,9 @@ def main(cfg: Config) -> None:
     if cfg.mode == "train":
         trainer = VisionEncoderDecoderTrainer(cfg)
         trainer.train()
-    elif cfg.mode == "fine_tune":
-        pass
+    elif cfg.mode == "finetuning":
+        finetuner = VisionEncoderDecoderFinetuner(cfg)
+        finetuner.train()
     elif cfg.mode == "inference":
         pass
     else:
