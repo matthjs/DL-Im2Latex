@@ -5,7 +5,6 @@ torch:
   float32_matmul_precision: "high"
   seed: 42
 
-
 dataset:
   train_dataset_path: "linxy/LaTeX_OCR"
   split_dataset_name: "human_handwrite"
@@ -15,11 +14,11 @@ dataset:
 # So the process is, save locally --> upload to huggingface --> load from huggingface
 # Setting vision_encoder_decoder_name
 model:
-  tokenizer_name: "Matthijs0/im2latex_model"    # Presumably "gpt2" is also fine?
+  tokenizer_name: "Matthijs0/im2latex_base"    # Presumably "gpt2" is also fine?
   feature_extractor: "microsoft/swin-base-patch4-window7-224-in22k"   # Not used
   encoder_name: "microsoft/swin-base-patch4-window7-224-in22k"    # not used
-  decoder_name: "Matthijs0/im2latex_model"
-  vision_encoder_decoder_name: "Matthijs0/im2latex_model"
+  decoder_name: "Matthijs0/im2latex_base"
+  vision_encoder_decoder_name: "Matthijs0/im2latex_base"
 
 # Not part of original configs but was hardcoded in the original code
 # TODO: Double check all hyperparams for finetuning
