@@ -10,7 +10,7 @@ from im2latex.conf.config_classes import Config
 from datasets import load_dataset
 from im2latex.util.latexdataset import LatexDataset, DataCollator
 
-from transformers import logging
+from transformers import logging, VisionEncoderDecoderModel
 
 warnings.filterwarnings("ignore")
 
@@ -74,6 +74,19 @@ class VisionEncoderDecoderFinetuner(VisionEncoderDecoderTrainer):
         if self.cfg.log_level >= 1:
             logger.debug("Finetuning")
             self.model.print_trainable_parameters()
+
+    def construct_vision_model(self) -> None:
+        """
+        Instead of loading a (pretrained) encoder and decoder we want to load
+        a full visionencoderdecoder model here.
+        """
+        self.model = VisionEncoderDecoderModel.from_pretrained(
+            self.cfg.model.vision_encoder_decoder_name    # Implicit assumption that this is set in the config
+        )
+
+        if self.cfg.log_level == 1:
+            logger.info(f"Loaded VisionEncoderDecoderModel {self.cfg.model.vision_encoder_decoder_name}")
+
 
     def setup_dataset(self) -> None:
         """

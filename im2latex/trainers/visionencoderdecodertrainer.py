@@ -84,6 +84,16 @@ class VisionEncoderDecoderTrainer(AbstractTrainer):
         self.avg_val_loss = None
         self.avg_bleu = None
 
+    def construct_vision_model(self) -> None:
+        """
+        This function is useful for the finetuner class
+        """
+        # Set up te vision encoder decoder model.
+        self.model = VisionEncoderDecoderModel.from_encoder_decoder_pretrained(
+            self.cfg.model.encoder_name,
+            self.cfg.model.decoder_name
+        )
+
     def setup_model(self) -> None:
         """
         Set up the VisionEncoderDecoderModel and tokenizer
@@ -93,11 +103,7 @@ class VisionEncoderDecoderTrainer(AbstractTrainer):
 
         self.feature_extractor = AutoFeatureExtractor.from_pretrained(self.cfg.model.feature_extractor)
 
-        # Set up te vision encoder decoder model.
-        self.model = VisionEncoderDecoderModel.from_encoder_decoder_pretrained(
-            self.cfg.model.encoder_name,
-            self.cfg.model.decoder_name
-        )
+        self.construct_vision_model()
 
         self.model.config.decoder_start_token_id = self.tokenizer.bos_token_id
         self.model.config.pad_token_id = self.tokenizer.pad_token_id

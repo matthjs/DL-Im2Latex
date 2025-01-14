@@ -22,6 +22,7 @@ class ModelConfig:
     feature_extractor: str = "microsoft/swin-base-patch4-window7-224-in22k"
     encoder_name: str = "microsoft/swin-base-patch4-window7-224-in22k"
     decoder_name: str = "gpt2"
+    vision_encoder_decoder_name: str = ""
 
 
 @dataclass
