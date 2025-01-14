@@ -79,12 +79,11 @@ class VisionEncoderDecoderFinetuner(VisionEncoderDecoderTrainer):
         a full visionencoderdecoder model here.
         """
         self.model = VisionEncoderDecoderModel.from_pretrained(
-            self.cfg.model.vision_encoder_decoder_name    # Implicit assumption that this is set in the config
+            self.cfg.model.vision_encoder_decoder_name  # Implicit assumption that this is set in the config
         )
 
         if self.cfg.log_level == 1:
             logger.info(f"Loaded VisionEncoderDecoderModel {self.cfg.model.vision_encoder_decoder_name}")
-
 
     def setup_dataset(self) -> None:
         """

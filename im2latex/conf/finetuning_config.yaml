@@ -21,7 +21,6 @@ model:
   vision_encoder_decoder_name: "Matthijs0/im2latex_base"
 
 # Not part of original configs but was hardcoded in the original code
-# TODO: Double check all hyperparams for finetuning
 decoding:
   max_length: 256
   early_stopping: True
@@ -30,8 +29,8 @@ decoding:
   num_beams: 4
 
 training:
-  distributed: False
-  num_epochs: 10    # TODO: Check for how long finetuning is done.
+  distributed: False   # This is actually not supported anymore
+  num_epochs: 40
   batch_size_train: 12
   batch_size_val: 12
   eval_max_batches: 20
@@ -65,7 +64,7 @@ image:
 
 checkpoint:
   checkpoint_dir: "checkpoints"
-  eval_steps: 200
+  eval_steps: 40
 
 metric:
   bleu: "google_bleu"
