@@ -1,6 +1,4 @@
 import os
-
-import torch
 from peft import LoraConfig, IA3Config, get_peft_model
 import warnings
 from im2latex.trainers import VisionEncoderDecoderTrainer

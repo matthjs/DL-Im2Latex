@@ -252,8 +252,6 @@ class VisionEncoderDecoderTrainer(AbstractTrainer):
                     epoch == self.num_epochs - 1 and step == total_steps_per_epoch - 1):
                 self._log_and_evaluate(global_step, interval_losses, train_losses)
 
-            break
-
         self.save_model(os.path.join(self.checkpoint_dir, f"checkpoint_step_{global_step}"))
 
         return interval_losses
@@ -353,7 +351,6 @@ class VisionEncoderDecoderTrainer(AbstractTrainer):
                 bleu_scores.append(bleu["google_bleu"])
 
                 num_evaluated_batches += 1
-                break
 
         self.avg_val_loss = np.mean(val_losses)
         self.avg_bleu = np.mean(bleu_scores)
