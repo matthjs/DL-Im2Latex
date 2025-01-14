@@ -85,6 +85,10 @@ class VisionEncoderDecoderFinetuner(VisionEncoderDecoderTrainer):
         if self.cfg.log_level == 1:
             logger.info(f"Loaded VisionEncoderDecoderModel {self.cfg.model.vision_encoder_decoder_name}")
 
+    def set_model_configs(self) -> None:
+        if self.cfg.log_level == 1:
+            logger.info(f"Skipping setting model configs when finetuning")
+
     def setup_dataset(self) -> None:
         """
         Code duplication w.r.t. parent class but for now this has to be done

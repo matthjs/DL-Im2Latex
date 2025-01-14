@@ -86,7 +86,8 @@ class VisionEncoderDecoderTrainer(AbstractTrainer):
 
     def construct_vision_model(self) -> None:
         """
-        This function is useful for the finetuner class
+        This function is useful for the finetuner class.
+        NOTE: This function should not be run outside `setup_model`.
         """
         # Set up te vision encoder decoder model.
         self.model = VisionEncoderDecoderModel.from_encoder_decoder_pretrained(
@@ -94,17 +95,11 @@ class VisionEncoderDecoderTrainer(AbstractTrainer):
             self.cfg.model.decoder_name
         )
 
-    def setup_model(self) -> None:
+    def set_model_configs(self) -> None:
         """
-        Set up the VisionEncoderDecoderModel and tokenizer
+        The behavior of this function is also overwritten in the finetuner class
+        NOTE: This function should not be run outside `setup_model`.
         """
-        self.tokenizer = AutoTokenizer.from_pretrained(self.cfg.model.tokenizer_name)
-        self.tokenizer.pad_token = self.tokenizer.eos_token
-
-        self.feature_extractor = AutoFeatureExtractor.from_pretrained(self.cfg.model.feature_extractor)
-
-        self.construct_vision_model()
-
         self.model.config.decoder_start_token_id = self.tokenizer.bos_token_id
         self.model.config.pad_token_id = self.tokenizer.pad_token_id
         self.model.config.eos_token_id = self.tokenizer.eos_token_id
@@ -117,6 +112,19 @@ class VisionEncoderDecoderTrainer(AbstractTrainer):
         self.model.config.num_beams = self.cfg.decoding.num_beams
 
         self.model.decoder.resize_token_embeddings(len(self.tokenizer))
+
+    def setup_model(self) -> None:
+        """
+        Set up the VisionEncoderDecoderModel and tokenizer
+        """
+        self.tokenizer = AutoTokenizer.from_pretrained(self.cfg.model.tokenizer_name)
+        self.tokenizer.pad_token = self.tokenizer.eos_token
+
+        self.feature_extractor = AutoFeatureExtractor.from_pretrained(self.cfg.model.feature_extractor)
+
+        self.construct_vision_model()
+
+        self.set_model_configs()
 
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         logger.info(f"Using device: {self.device}")
