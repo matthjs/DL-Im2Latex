@@ -1,4 +1,6 @@
 import os
+
+import torch
 from peft import LoraConfig, IA3Config, get_peft_model
 import warnings
 from im2latex.trainers import VisionEncoderDecoderTrainer
@@ -68,6 +70,7 @@ class VisionEncoderDecoderFinetuner(VisionEncoderDecoderTrainer):
         )
 
         self.model = get_peft_model(self.model, self.lora_config)
+        torch.compile(self.model)
 
         if self.cfg.log_level >= 1:
             logger.debug("Finetuning")
@@ -100,7 +103,6 @@ class VisionEncoderDecoderFinetuner(VisionEncoderDecoderTrainer):
         val_ds = dataset['validation']
         test_ds = dataset['test']
 
-        # TODO: Check if this is necessary.
         def filter_dataset(dataset):
             def is_valid_sample(sample):
                 try:
