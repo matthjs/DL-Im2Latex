@@ -94,8 +94,17 @@ class DataCollator:
         if DataCollator.padding_value < 0:
             raise ValueError("padding value not set.")
 
-        # padding the labels
-        labels = pad_sequence(labels, batch_first=True, padding_value=DataCollator.padding_value)
+        # These first two conditions were only used in the finetuning in the original paper
+        # but I do not see why they would case a problem with training on the standard dataset.
+        if len(labels) == 0:
+            # if all labels are empty, return a dummy tensor
+            labels = torch.zeros((len(batch), 1), dtype=torch.long)
+        elif len(labels) == 1:
+            # if there's only one sample, add a dimension to make it a batch
+            labels = labels[0].unsqueeze(0)
+        else:
+            # padding the labels
+            labels = pad_sequence(labels, batch_first=True, padding_value=DataCollator.padding_value)
 
         return {
             'pixel_values': pixel_values,

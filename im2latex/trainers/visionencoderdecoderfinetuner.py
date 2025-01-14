@@ -93,14 +93,12 @@ class VisionEncoderDecoderFinetuner(VisionEncoderDecoderTrainer):
         """
         Code duplication w.r.t. parent class but for now this has to be done
         as this filter_dataset function needs to be used (?).
+        NOTE: This function is dataset specific.
         """
         dataset = load_dataset(self.cfg.dataset.train_dataset_path, self.cfg.dataset.split_dataset_name)
-        train_val_split = dataset["train"].train_test_split(test_size=self.cfg.dataset.val_test_size,
-                                                            seed=self.cfg.torch.seed)
-        train_ds = train_val_split["train"]
-        val_test_split = train_val_split["test"].train_test_split(test_size=0.5, seed=self.cfg.torch.seed)
-        val_ds = val_test_split["train"]
-        test_ds = val_test_split["test"]
+        train_ds = dataset['train']
+        val_ds = dataset['validation']
+        test_ds = dataset['test']
 
         # TODO: Check if this is necessary.
         def filter_dataset(dataset):
