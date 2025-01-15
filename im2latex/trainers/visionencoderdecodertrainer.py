@@ -213,6 +213,7 @@ class VisionEncoderDecoderTrainer(AbstractTrainer):
 
         for epoch in range(self.num_epochs):
             epoch_start_time = time.time()
+            self.model.train()
             interval_losses = self._train_one_epoch(epoch, total_steps_per_epoch, train_losses)
 
             # Log epoch duration

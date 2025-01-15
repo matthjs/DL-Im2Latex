@@ -23,6 +23,7 @@ class VisionEncoderDecoderFinetuner(VisionEncoderDecoderTrainer):
 
     def __init__(self, cfg: Config):
         super().__init__(cfg)
+        # self.construct_vision_model()
         self.lora_config = None
         self.ia3_config = None
         self._setup_finetuning()
@@ -34,6 +35,8 @@ class VisionEncoderDecoderFinetuner(VisionEncoderDecoderTrainer):
         if self.cfg.finetuning is None:
             raise ValueError("Hardcoded settings no supported, include finetuning"
                              "configs in the config file")
+            
+        print(f"Adding trainable parameters to {self.cfg.finetuning.target_modules}")
 
         # setting up the adapter
         self.lora_config = LoraConfig(
@@ -70,7 +73,8 @@ class VisionEncoderDecoderFinetuner(VisionEncoderDecoderTrainer):
         )
 
         self.model = get_peft_model(self.model, self.lora_config)
-        torch.compile(self.model)
+        self.setup_optimizers()
+        # torch.compile(self.model)
 
         if self.cfg.log_level >= 1:
             logger.debug("Finetuning")

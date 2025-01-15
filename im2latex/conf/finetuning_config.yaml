@@ -33,7 +33,7 @@ training:
   num_epochs: 40
   batch_size_train: 12
   batch_size_val: 12
-  eval_max_batches: 20
+  eval_max_batches: 5
   learning_rate: 2e-4
   warmup_steps: 400
   max_grad_norm: 1.0
@@ -46,7 +46,7 @@ finetuning:
   lora_r: 16
   lora_alpha: 16
   target_modules:
-    - attn.qkv    Encoder (Swin Transformer) modules
+    - attn.qkv
     - attn.proj
     - mlp.fc1
     - mlp.fc2
@@ -64,7 +64,7 @@ image:
 
 checkpoint:
   checkpoint_dir: "checkpoints"
-  eval_steps: 40
+  eval_steps: 400
 
 metric:
   bleu: "google_bleu"
