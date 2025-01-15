@@ -5,6 +5,8 @@ from im2latex.conf.config_classes import Config
 from im2latex.trainers import VisionEncoderDecoderTrainer, VisionEncoderDecoderFinetuner
 from dotenv import load_dotenv
 
+from im2latex.util.inference_app import inference
+
 
 @hydra.main(version_base=None, config_path="conf", config_name="config")
 def main(cfg: Config) -> None:
@@ -23,7 +25,7 @@ def main(cfg: Config) -> None:
         finetuner = VisionEncoderDecoderFinetuner(cfg)
         finetuner.train()
     elif cfg.mode == "inference":
-        pass
+        inference()
     else:
         raise ValueError("Invalid mode")
 
