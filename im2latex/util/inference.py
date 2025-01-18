@@ -13,7 +13,7 @@ tokenizer = AutoTokenizer.from_pretrained("DGurgurov/im2latex")
 feature_extractor = AutoFeatureExtractor.from_pretrained("DGurgurov/im2latex")
 
 # loading the dataset
-new_dataset = load_dataset("linxy/LaTeX_OCR", "human_handwrite")
+new_dataset = load_dataset("linxy/LaTeX_OCR", "synthetic_handwrite")
 test_ds = new_dataset['test']
 
 
@@ -127,6 +127,7 @@ for batch_idx, batch in enumerate(test_dataloader):
     generated_ids = model.generate(pixel_values)
     generated_texts = tokenizer.batch_decode(generated_ids, skip_special_tokens=True)
     inferences.append(generated_texts[0])
+    break
 
 # saving inferences to a text file
 output_file = "inferences.txt"
