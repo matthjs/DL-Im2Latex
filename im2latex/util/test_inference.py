@@ -3,12 +3,12 @@ import torch
 from PIL import Image
 
 # Load model, tokenizer, and feature extractor
-model = VisionEncoderDecoderModel.from_pretrained("Matthijs0/im2latex")
-tokenizer = AutoTokenizer.from_pretrained("Matthijs0/im2latex")
-feature_extractor = AutoFeatureExtractor.from_pretrained("Matthijs0/im2latex")
+model = VisionEncoderDecoderModel.from_pretrained("Matthijs0/im2latex_base")
+tokenizer = AutoTokenizer.from_pretrained("Matthijs0/im2latex_base")
+feature_extractor = AutoFeatureExtractor.from_pretrained("microsoft/swin-base-patch4-window7-224-in22k")
 
 # Prepare an image
-image = Image.open("./image.jpg").convert("RGB")
+image = Image.open("./image2.png").convert("RGB")
 pixel_values = feature_extractor(images=image, return_tensors="pt").pixel_values
 
 # Generate LaTeX formula
