@@ -20,7 +20,7 @@ def load_model():
 model, tokenizer, feature_extractor = load_model()
 
 # Streamlit App
-st.title("Screenshot to LaTeX Formula")
+st.title("Image to LaTeX Formula")
 
 # Screenshot section
 if st.button("Take Screenshot"):
