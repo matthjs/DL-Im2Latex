@@ -16,8 +16,8 @@ from im2latex.evaluators.swingradcam import swin_reshape_transform, SwinEncoderW
 # Load model, tokenizer, and feature extractor
 @st.cache_resource
 def load_model():
-    model = VisionEncoderDecoderModel.from_pretrained("Matthijs0/im2latex_base")
-    tokenizer = AutoTokenizer.from_pretrained("Matthijs0/im2latex_base")
+    model = VisionEncoderDecoderModel.from_pretrained("Matthijs0/im2latex")
+    tokenizer = AutoTokenizer.from_pretrained("Matthijs0/im2latex")
     feature_extractor = AutoFeatureExtractor.from_pretrained("microsoft/swin-base-patch4-window7-224-in22k")
     return model, tokenizer, feature_extractor
 
