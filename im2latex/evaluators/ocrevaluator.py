@@ -3,6 +3,7 @@ from loguru import logger
 import evaluate
 import torch
 import wandb
+from torch import nn
 from tqdm import tqdm
 from pytorch_grad_cam import GradCAM, HiResCAM, ScoreCAM, GradCAMPlusPlus, AblationCAM, XGradCAM, EigenCAM, FullGrad
 from pytorch_grad_cam.utils.model_targets import ClassifierOutputTarget
@@ -11,7 +12,8 @@ from torch.utils.data import DataLoader, SequentialSampler
 from transformers import VisionEncoderDecoderModel, AutoTokenizer, AutoFeatureExtractor
 from im2latex.conf.config_classes import Config
 from datasets import load_dataset
-
+import numpy as np
+from im2latex.evaluators.swingradcam import SwinEncoderWrapper, GradCamAdaptor, swin_reshape_transform
 from im2latex.util.latexdataset import LatexDataset, DataCollator
 
 
@@ -44,11 +46,6 @@ class OCREvaluator:
             )
 
         self.dataset = raw_dataset
-
-        # gradcam target layers
-        # Uhh yeah this line is a bit
-        self.target_layers = [list(self.models.values())[0][0].encoder.encoder.layers[-1].blocks[-1].layernorm_after]
-
         self.metrics = {
             "google_bleu": evaluate.load("google_bleu"),
             # "perplexity": evaluate.load("perplexity", module_type="metric")
@@ -70,6 +67,9 @@ class OCREvaluator:
             model, tokenizer, feature_extractor = comp
             model.to(self.device)
             model.eval()
+
+            wrapped_encoder = SwinEncoderWrapper(model.encoder, feature_extractor)
+            target_layers = [model.encoder.encoder.layers[-1].blocks[-1].layernorm_after]
 
             DataCollator.padding_value = tokenizer.pad_token_id
             dataset = LatexDataset(self.dataset,
@@ -105,22 +105,23 @@ class OCREvaluator:
                     logger.info("Executing gradcam")
                     grad_cam_counter += 1
 
-                    # Bring the channels to the first dimension,
-                    # like in CNNs
-                    def reshape_transform(tensor, height=7, width=7):
-                        # tensor = tensor[0]    # tensor is a tuple idk why
-                        result = tensor.reshape(tensor.size(0),
-                                                height, width, tensor.size(2))
-                        return result.transpose(2, 3).transpose(1, 2)
+                    with GradCamAdaptor(model=wrapped_encoder, target_layers=target_layers,
+                                        reshape_transform=swin_reshape_transform) as cam:
+                        grayscale_cam_batch = cam(input_tensor=pixel_values,
+                                                  aug_smooth=True, eigen_smooth=True)
 
-                    with GradCAM(model=model.encoder, target_layers=self.target_layers,
-                                 reshape_transform=reshape_transform) as cam:
-                        grayscale_cam_batch = cam(input_tensor=pixel_values, aug_smooth=True, eigen_smooth=True)
-
-                        for idx, grayscale_cam in enumerate(grayscale_cam_batch):
+                        idx = 0
+                        for grayscale_cam in grayscale_cam_batch:
+                            # Convert to numpy and normalize to [0, 1]
+                            # Apparently gradcam really wants this bruh
                             rgb_image = pixel_values[idx].cpu().numpy()
+                            rgb_image = np.transpose(rgb_image, (1, 2, 0))
+                            rgb_image = (rgb_image - rgb_image.min()) / (rgb_image.max() - rgb_image.min())
+                            rgb_image = rgb_image.astype(np.float32)  # Ensure type is float32
+
                             visualization = show_cam_on_image(rgb_image, grayscale_cam, use_rgb=True)
                             gradcam_visualizations.append(visualization)
+                            idx += 1
                 break
             for metric_name, metric in self.metrics.items():
                 metric_results[metric_name] = metric.compute()
@@ -128,6 +129,10 @@ class OCREvaluator:
 
             # Log GradCam results
             if use_grad_cam and gradcam_visualizations:
+                from PIL import Image
+                output_path = f"gradcam_visualization_{idx + 1}.png"
+                Image.fromarray(visualization).save(output_path)
+                print(f"GradCAM visualization saved to {output_path}")
                 wandb.log({f"{model_name}_gradcam_visualizations": [wandb.Image(img) for img in
                                                                     gradcam_visualizations]})
 

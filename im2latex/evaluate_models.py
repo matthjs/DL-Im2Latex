@@ -19,7 +19,7 @@ def evaluate_im2latex():
     test_ds = val_test_split["test"]
 
     evaluator = OCREvaluator(models, raw_dataset=test_ds, batch_size=8)
-    evaluator.evaluate(use_grad_cam=False)
+    evaluator.evaluate(use_grad_cam=True)
 
 
 # For simplicity, I am making this a separate script, as I want
