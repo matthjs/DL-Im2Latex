@@ -35,14 +35,14 @@ class VisionEncoderDecoderFinetuner(VisionEncoderDecoderTrainer):
         if self.cfg.finetuning is None:
             raise ValueError("Hardcoded settings no supported, include finetuning"
                              "configs in the config file")
-            
+
         print(f"Adding trainable parameters to {self.cfg.finetuning.target_modules}")
 
         # setting up the adapter
         self.lora_config = LoraConfig(
             r=self.cfg.finetuning.lora_r,
             lora_alpha=self.cfg.finetuning.lora_alpha,
-            target_modules=self.cfg.finetuning.target_modules,
+            target_modules=list(self.cfg.finetuning.target_modules),
             lora_dropout=self.cfg.finetuning.lora_dropout,
             bias=self.cfg.finetuning.bias  # ignore type error
             # task_type="VL"  # Vision-Language task
@@ -160,16 +160,3 @@ class VisionEncoderDecoderFinetuner(VisionEncoderDecoderTrainer):
                                           batch_size=self.cfg.training.batch_size_val,
                                           sampler=test_sampler,
                                           collate_fn=DataCollator.data_collator)
-
-    def save_model(self, checkpoint_path: str) -> 'AbstractTrainer':
-        """
-        Save the current model and tokenizer.
-
-        :param checkpoint_path: Path to save the model checkpoint.
-        """
-        os.makedirs(checkpoint_path, exist_ok=True)
-        self.model.base_model.save_pretrained(checkpoint_path)
-        self.tokenizer.save_pretrained(checkpoint_path)
-        print(f"Model saved at {checkpoint_path}")
-
-        return self

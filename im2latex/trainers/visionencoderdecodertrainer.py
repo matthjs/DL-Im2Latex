@@ -376,6 +376,7 @@ class VisionEncoderDecoderTrainer(AbstractTrainer):
         os.makedirs(checkpoint_path, exist_ok=True)
         self.model.save_pretrained(checkpoint_path)
         self.tokenizer.save_pretrained(checkpoint_path)
+        self.feature_extractor.save_pretrained(checkpoint_path)
         print(f"Model saved at {checkpoint_path}")
 
         return self
@@ -388,6 +389,7 @@ class VisionEncoderDecoderTrainer(AbstractTrainer):
         """
         self.model = self.model.from_pretrained(checkpoint_path).to(self.device)
         self.tokenizer = self.tokenizer.from_pretrained(checkpoint_path)
+        self.feature_extractor = self.feature_extractor.from_pretrained(checkpoint_path)
         print(f"Model loaded from {checkpoint_path}")
 
         return self
