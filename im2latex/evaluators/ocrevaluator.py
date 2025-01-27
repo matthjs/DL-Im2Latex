@@ -15,6 +15,7 @@ from datasets import load_dataset
 import numpy as np
 from im2latex.evaluators.swingradcam import SwinEncoderWrapper, GradCamAdaptor, swin_reshape_transform
 from im2latex.util.latexdataset import LatexDataset, DataCollator
+import time
 
 
 def get_device():
@@ -87,9 +88,15 @@ class OCREvaluator:
 
             eval_iterator = tqdm(dataloader, desc=f"Evaluation {model_name}")
             grad_cam_counter = 0
+
+            # Track inference time
+            total_time = 0
+            total_samples = 0
             for batch_idx, batch in enumerate(eval_iterator):
                 pixel_values = batch["pixel_values"].to(self.device)
                 labels = batch["labels"].to(self.device)
+
+                start_time = time.time()    #  Start timer for inference
 
                 outputs = model(pixel_values=pixel_values, labels=labels)
                 metric_results["test loss"] = outputs.loss.item()
@@ -97,6 +104,14 @@ class OCREvaluator:
                 generated_ids = model.generate(pixel_values)
                 generated_texts = tokenizer.batch_decode(generated_ids, skip_special_tokens=True)
                 label_texts = tokenizer.batch_decode(labels, skip_special_tokens=True)
+
+                # End timer for inference
+                end_time = time.time()
+                inference_time = end_time - start_time
+
+                # Update total time and samples count
+                total_time += inference_time
+                total_samples += len(labels)
 
                 for metric_name, metric in self.metrics.items():
                     metric.add_batch(predictions=generated_texts, references=label_texts)
@@ -135,6 +150,12 @@ class OCREvaluator:
                 print(f"GradCAM visualization saved to {output_path}")
                 wandb.log({f"{model_name}_gradcam_visualizations": [wandb.Image(img) for img in
                                                                     gradcam_visualizations]})
+
+            # Calculate inference time per sample
+            if total_samples > 0:
+                inference_time_per_sample = total_time / total_samples
+                logger.info(f"Inference time per sample for {model_name}: {inference_time_per_sample:.4f} seconds")
+                metric_results["inference_time_per_sample"] = inference_time_per_sample
 
             wandb.log({f"{model_name}_metrics": metric_results})
             all_models_results[model_name] = metric_results

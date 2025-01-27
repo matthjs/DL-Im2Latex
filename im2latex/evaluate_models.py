@@ -5,7 +5,7 @@ from im2latex.evaluators.ocrevaluator import OCREvaluator
 
 def evaluate_im2latex():
     models = {
-        "Im2LaTeX": "Matthijs0/im2latex_base",
+        "Im2LaTeX": "Matthijs0/im2latex",
         "Im2LaTeX_ref": "DGurgurov/im2latex"
     }
 
