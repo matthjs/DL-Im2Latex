@@ -15,7 +15,7 @@ def evaluate_im2latex():
     train_val_split = dataset["train"].train_test_split(test_size=0.2,
                                                         seed=42)
     train_ds = train_val_split["train"]
-    val_test_split = train_val_split["test"].train_test_split(test_size=0.001, seed=42)
+    val_test_split = train_val_split["test"].train_test_split(test_size=0.5, seed=42)
     val_ds = val_test_split["train"]
     test_ds = val_test_split["test"]
 
