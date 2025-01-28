@@ -42,7 +42,7 @@ class OCREvaluator:
             self.models[model_name] = (
                 VisionEncoderDecoderModel.from_pretrained(model_path).to("cuda"),
                 AutoTokenizer.from_pretrained(model_path),
-                AutoFeatureExtractor.from_pretrained("microsoft/swin-base-patch4-window7-224-in22k")
+                AutoFeatureExtractor.from_pretrained('microsoft/swin-base-patch4-window7-224-in22k')
                 # Hardcoded for now
             )
 
@@ -62,6 +62,7 @@ class OCREvaluator:
         wandb.init(project="im2latex", name="evaluation-run")
 
         all_models_results = {}
+        torch.set_float32_matmul_precision('high')
 
         for model_name, comp in self.models.items():
             logger.info(f"Evaluating {model_name} on evaluation dataset...")
@@ -81,7 +82,8 @@ class OCREvaluator:
             dataloader = DataLoader(dataset,
                                     batch_size=self.batch_size,
                                     sampler=SequentialSampler(dataset),
-                                    collate_fn=DataCollator.data_collator)
+                                    collate_fn=DataCollator.data_collator,
+                                    pin_memory=True)
 
             metric_results = {}
             gradcam_visualizations = []
@@ -92,6 +94,7 @@ class OCREvaluator:
             # Track inference time
             total_time = 0
             total_samples = 0
+            
             for batch_idx, batch in enumerate(eval_iterator):
                 pixel_values = batch["pixel_values"].to(self.device)
                 labels = batch["labels"].to(self.device)
@@ -123,7 +126,7 @@ class OCREvaluator:
                     with GradCamAdaptor(model=wrapped_encoder, target_layers=target_layers,
                                         reshape_transform=swin_reshape_transform) as cam:
                         grayscale_cam_batch = cam(input_tensor=pixel_values,
-                                                  aug_smooth=True, eigen_smooth=True)
+                                                aug_smooth=True, eigen_smooth=True)
 
                         idx = 0
                         for grayscale_cam in grayscale_cam_batch:
@@ -137,6 +140,7 @@ class OCREvaluator:
                             visualization = show_cam_on_image(rgb_image, grayscale_cam, use_rgb=True)
                             gradcam_visualizations.append(visualization)
                             idx += 1
+                                
             for metric_name, metric in self.metrics.items():
                 metric_results[metric_name] = metric.compute()
                 # metric.reset()
@@ -157,6 +161,7 @@ class OCREvaluator:
                 metric_results["inference_time_per_sample"] = inference_time_per_sample
 
             wandb.log({f"{model_name}_metrics": metric_results})
+            logger.info(f"Results for {model_name}: {metric_results}")
             all_models_results[model_name] = metric_results
 
         logger.info("Evaluation complete.")
