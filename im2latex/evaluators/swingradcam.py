@@ -24,10 +24,6 @@ class SwinEncoderWrapper(torch.nn.Module):
         self.feature_extractor = feature_extractor
 
     def forward(self, x):
-        # features = self.feature_extractor(
-        #         images=x,
-        #         return_tensors="pt",
-        #    ).pixel_values.squeeze()
         outputs = self.encoder(x)
         return outputs.last_hidden_state  # Return actual feature tensor
 

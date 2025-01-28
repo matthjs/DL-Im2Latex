@@ -137,7 +137,6 @@ class OCREvaluator:
                             visualization = show_cam_on_image(rgb_image, grayscale_cam, use_rgb=True)
                             gradcam_visualizations.append(visualization)
                             idx += 1
-                break
             for metric_name, metric in self.metrics.items():
                 metric_results[metric_name] = metric.compute()
                 # metric.reset()
