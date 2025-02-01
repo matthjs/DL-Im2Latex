@@ -1,8 +1,9 @@
 import torch
 import numpy as np
-from torch.utils.data import DataLoader, Dataset, DistributedSampler
+from torch.utils.data import Dataset
 from PIL import Image
 from torch.nn.utils.rnn import pad_sequence
+
 
 # Classes taken from https://github.com/d-gurgurov/im2latex/blob/main/src/im2latex_train.py
 class LatexDataset(Dataset):
