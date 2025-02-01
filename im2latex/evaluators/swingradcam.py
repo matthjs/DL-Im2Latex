@@ -2,7 +2,6 @@
 This wrapper class is needed to make sure Gradcam works.
 """
 from typing import List
-
 import numpy as np
 import torch
 from pytorch_grad_cam import GradCAM
@@ -11,7 +10,8 @@ from pytorch_grad_cam.utils.model_targets import ClassifierOutputTarget
 
 # Bring the channels to the first dimension,
 # like in CNNs
-def swin_reshape_transform(tensor, height=7, width=7):  # tensor is a tuple idk why
+# Taken from https://jacobgil.github.io/pytorch-gradcam-book/vision_transformers.html
+def swin_reshape_transform(tensor, height=7, width=7):
     result = tensor.reshape(tensor.size(0),
                             height, width, tensor.size(2))
     return result.transpose(2, 3).transpose(1, 2)

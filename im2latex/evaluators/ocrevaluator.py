@@ -43,16 +43,14 @@ class OCREvaluator:
                 VisionEncoderDecoderModel.from_pretrained(model_path).to("cuda"),
                 AutoTokenizer.from_pretrained(model_path),
                 AutoFeatureExtractor.from_pretrained('microsoft/swin-base-patch4-window7-224-in22k')
-                # Hardcoded for now
             )
 
         self.dataset = raw_dataset
         self.metrics = {
             "google_bleu": evaluate.load("google_bleu"),
-            # "perplexity": evaluate.load("perplexity", module_type="metric")
         }
 
-        self.image_size = image_size  # Better way to handle this?
+        self.image_size = image_size
         self.batch_size = batch_size
 
         self.device = get_device()
@@ -143,7 +141,6 @@ class OCREvaluator:
                                 
             for metric_name, metric in self.metrics.items():
                 metric_results[metric_name] = metric.compute()
-                # metric.reset()
 
             # Log GradCam results
             if use_grad_cam and gradcam_visualizations:

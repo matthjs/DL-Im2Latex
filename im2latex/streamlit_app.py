@@ -3,13 +3,10 @@ HOW TO RUN:  streamlit run streamlit_app.py
 """
 import streamlit as st
 import pyperclip
-import torch
 from PIL import Image, ImageGrab
 from transformers import VisionEncoderDecoderModel, AutoTokenizer, AutoFeatureExtractor
 import numpy as np
-from pytorch_grad_cam import GradCAM
 from pytorch_grad_cam.utils.image import show_cam_on_image
-
 from im2latex.evaluators.swingradcam import swin_reshape_transform, SwinEncoderWrapper, GradCamAdaptor
 
 

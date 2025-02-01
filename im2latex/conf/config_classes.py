@@ -65,7 +65,7 @@ class MetricConfig:
 
 @dataclass
 class FineTuningConfig:
-    # Only make the finetunign configurable
+    # Only make the finetuning configurable
     lora_r: Optional[int] = None
     lora_alpha: Optional[int] = None
     # Target

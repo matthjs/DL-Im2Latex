@@ -6,8 +6,8 @@ from im2latex.evaluators.ocrevaluator import OCREvaluator
 def evaluate_im2latex():
     models = {
         "Im2LaTeX": "Matthijs0/im2latex_base",
-        #"Im2LaTeX_handwrite": "Matthijs0/im2latex",
-        #"Im2LaTeX_ref": "DGurgurov/im2latex"
+        # "Im2LaTeX_handwrite": "Matthijs0/im2latex",
+        # "Im2LaTeX_ref": "DGurgurov/im2latex"
     }
 
     dataset = load_dataset("OleehyO/latex-formulas", "cleaned_formulas")
@@ -24,7 +24,7 @@ def evaluate_im2latex():
         evaluator.evaluate(use_grad_cam=False, grad_cam_batches=2)
 
 
-# For simplicity, I am making this a separate script, as I want
+# For simplicity a separate script
 # to not have this be dependent on a config file.
 if __name__ == "__main__":
     evaluate_im2latex()

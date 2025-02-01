@@ -25,7 +25,6 @@ from im2latex.util.latexdataset import LatexDataset, DataCollator
 
 from transformers import logging
 
-# Stop intialization of weights warning
 logging.set_verbosity_error()
 
 

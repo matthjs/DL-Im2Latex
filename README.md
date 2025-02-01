@@ -8,6 +8,8 @@
 
 ## About The Project
 
+Deep Learning Project on Transformer Optical Character Recognition (TrOCR). Specifically, generation of LaTeX equation code from a LaTeX image.
+
 ## Getting started
 
 ### Prerequisites
@@ -34,8 +36,7 @@ IDEs like Pycharm will be able to detect the interpreter of this virtual environ
 
 ## Usage
 
-
-# Acknowledgements
+See `main.py` for training or finetuning, `evaluate_models.py` for evaluation and `streamlit_app` for an inference GUI.
 
 # License
 This project is licensed under the GNU Affero General Public License v3.0 - see the [LICENSE](./LICENSE) file for details.
