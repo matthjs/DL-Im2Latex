@@ -1,11 +1,11 @@
 import torch
 import numpy as np
-from torch.utils.data import DataLoader, Dataset, DistributedSampler
+from torch.utils.data import Dataset
 from PIL import Image
 from torch.nn.utils.rnn import pad_sequence
 
 
-# TODO: I copied this from the original code base for now but we will need to modify it.
+# Classes taken from https://github.com/d-gurgurov/im2latex/blob/main/src/im2latex_train.py
 class LatexDataset(Dataset):
     def __init__(
             self,
@@ -38,8 +38,18 @@ class LatexDataset(Dataset):
 
     def __getitem__(self, idx):
         item = self.dataset[idx]
-        latex_sequence = item['latex_formula']
+        if 'latex_formula' in item:
+            latex_sequence = item['latex_formula']
+        elif 'text' in item:
+            latex_sequence = item['text']
+        else:
+            raise ValueError("No valid dataset type does not have 'latex' or 'text' key for items")
+
         image = item['image']
+
+        # converting RGBA to RGB for the test set --> some images have alphas
+        if image.mode == 'RGBA':
+            image = image.convert('RGB')
 
         # image processing
         if self.phase == 'train':
@@ -84,8 +94,17 @@ class DataCollator:
         if DataCollator.padding_value < 0:
             raise ValueError("padding value not set.")
 
-        # padding the labels
-        labels = pad_sequence(labels, batch_first=True, padding_value=DataCollator.padding_value)
+        # These first two conditions were only used in the finetuning in the original paper
+        # but I do not see why they would case a problem with training on the standard dataset.
+        if len(labels) == 0:
+            # if all labels are empty, return a dummy tensor
+            labels = torch.zeros((len(batch), 1), dtype=torch.long)
+        elif len(labels) == 1:
+            # if there's only one sample, add a dimension to make it a batch
+            labels = labels[0].unsqueeze(0)
+        else:
+            # padding the labels
+            labels = pad_sequence(labels, batch_first=True, padding_value=DataCollator.padding_value)
 
         return {
             'pixel_values': pixel_values,

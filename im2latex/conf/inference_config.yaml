@@ -1,0 +1,70 @@
+mode: "inference"
+log_level: 1
+
+torch:
+  float32_matmul_precision: "high"
+  seed: 42
+
+dataset:
+  train_dataset_path: "linxy/LaTeX_OCR"
+  split_dataset_name: "human_handwrite"
+  val_test_size: 0.2
+
+# Right now the code only support model loading from huggingface and not local.
+# So the process is, save locally --> upload to huggingface --> load from huggingface
+# Setting vision_encoder_decoder_name
+model:
+  tokenizer_name: "Matthijs0/im2latex"    # Presumably "gpt2" is also fine?
+  feature_extractor: "Matthijs0/im2latex"   # Not used
+  encoder_name: "Matthijs0/im2latex"    # not used
+  decoder_name: "Matthijs0/im2latex"
+  vision_encoder_decoder_name: "Matthijs0/im2latex"
+
+# Not part of original configs but was hardcoded in the original code
+decoding:
+  max_length: 256
+  early_stopping: True
+  no_repeat_ngram_size: 3
+  length_penalty: 2.0
+  num_beams: 4
+
+training:
+  distributed: False   # This is actually not supported anymore
+  num_epochs: 40
+  batch_size_train: 12
+  batch_size_val: 12
+  eval_max_batches: 20
+  learning_rate: 2e-4
+  warmup_steps: 400
+  max_grad_norm: 1.0
+  betas:
+    - 0.95
+    - 0.98
+  eps: 1e-08
+
+finetuning:
+  lora_r: 16
+  lora_alpha: 16
+  target_modules:
+    - attn.qkv    Encoder (Swin Transformer) modules
+    - attn.proj
+    - mlp.fc1
+    - mlp.fc2
+    - c_attn    # Decoder (GPT-2) modules
+    - c_proj
+    - c_fc
+    - attn.c_proj
+  lora_dropout: 0.1
+  bias: "none"
+
+image:
+  image_size:
+    - 224
+    - 468
+
+checkpoint:
+  checkpoint_dir: "checkpoints"
+  eval_steps: 40
+
+metric:
+  bleu: "google_bleu"
