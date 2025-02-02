@@ -14,7 +14,7 @@ warnings.filterwarnings("ignore")
 class VisionEncoderDecoderFinetuner(VisionEncoderDecoderTrainer):
     """
     Decorator class for VisionEncoderDecoderTrainer. Change the behavior to perform
-    finetuning instead of full all parameter training.
+    finetuning instead of full parameter training.
     """
 
     def __init__(self, cfg: Config):
@@ -25,7 +25,7 @@ class VisionEncoderDecoderFinetuner(VisionEncoderDecoderTrainer):
 
     def _setup_finetuning(self) -> None:
         """
-        Sets up finetuning configurations for LoRA and IA³ adapters.
+        Sets up finetuning configurations for LoRA adapters.
         """
         if self.cfg.finetuning is None:
             raise ValueError("Hardcoded settings no supported, include finetuning"

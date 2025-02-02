@@ -14,7 +14,7 @@ dataset:
 # So the process is, save locally --> upload to huggingface --> load from huggingface
 # Setting vision_encoder_decoder_name
 model:
-  tokenizer_name: "Matthijs0/im2latex_base"    # Presumably "gpt2" is also fine?
+  tokenizer_name: "Matthijs0/im2latex_base"
   feature_extractor: "microsoft/swin-base-patch4-window7-224-in22k"   # Not used
   encoder_name: "microsoft/swin-base-patch4-window7-224-in22k"    # not used
   decoder_name: "Matthijs0/im2latex_base"
